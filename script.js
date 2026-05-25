@@ -67,44 +67,6 @@ let currentIndex = 0;
 let currentDuas = [];
 let currentPerson = '';
 
-// --- Voice Setup ---
-let synth = window.speechSynthesis;
-let maleVoice = null;
-let femaleVoice = null;
-
-function loadVoices() {
-    let voices = synth.getVoices();
-    let arabicVoices = voices.filter(v => v.lang.startsWith('ar'));
-    
-    // Try to find known female and male voice names
-    femaleVoice = arabicVoices.find(v => v.name.includes('Hoda') || v.name.includes('Laila') || v.name.includes('Zeina')) || arabicVoices[0];
-    maleVoice = arabicVoices.find(v => v.name.includes('Naayf') || v.name.includes('Maged') || v.name.includes('Tarik') || v.name.includes('Majed')) || arabicVoices[0];
-}
-
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = loadVoices;
-}
-loadVoices();
-
-function speakText(text) {
-    if (synth.speaking) {
-        synth.cancel();
-    }
-    let utterThis = new SpeechSynthesisUtterance(text);
-    utterThis.lang = 'ar-SA';
-    utterThis.rate = 0.8; // Speak slowly for reverence
-    
-    if (currentPerson === 'fadwa') {
-        if (femaleVoice) utterThis.voice = femaleVoice;
-        utterThis.pitch = 1.2; // Higher pitch
-    } else {
-        if (maleVoice) utterThis.voice = maleVoice;
-        utterThis.pitch = 0.8; // Lower pitch
-    }
-    
-    synth.speak(utterThis);
-}
-
 function resetTimer() {
     clearInterval(currentInterval);
     currentInterval = setInterval(() => {
@@ -126,7 +88,6 @@ function displayDua(index) {
             contentDiv.textContent = finalText;
             contentDiv.classList.remove('fade-out');
             contentDiv.classList.add('fade-in');
-            speakText(finalText);
         }, 800);
         return;
     }
@@ -140,7 +101,6 @@ function displayDua(index) {
         contentDiv.textContent = text;
         contentDiv.classList.remove('fade-out');
         contentDiv.classList.add('fade-in');
-        speakText(text);
     }, 500); // Wait for fade out
 }
 
@@ -189,7 +149,6 @@ function startDua(person) {
         contentDiv.textContent = text;
         contentDiv.classList.remove('fade-out');
         contentDiv.classList.add('fade-in');
-        speakText(text);
         
         resetTimer();
     }, 1000);
