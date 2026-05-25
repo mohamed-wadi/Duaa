@@ -74,8 +74,20 @@ function resetTimer() {
     }, 15000);
 }
 
+function updateProgress(index) {
+    if (currentDuas.length === 0) return;
+    const total = currentDuas.length;
+    // When index >= total, it's finished, show 100%
+    const current = index >= total ? total : index + 1;
+    const percentage = Math.round((current / total) * 100);
+    
+    document.getElementById('progress-text').textContent = `${percentage}%`;
+    document.getElementById('progress-circle').style.background = `conic-gradient(var(--accent) ${percentage}%, var(--light-pink) ${percentage}%)`;
+}
+
 function displayDua(index) {
     const contentDiv = document.getElementById('dua-content');
+    updateProgress(index);
     
     if (index >= currentDuas.length) {
         clearInterval(currentInterval);
@@ -150,6 +162,7 @@ function startDua(person) {
         contentDiv.classList.remove('fade-out');
         contentDiv.classList.add('fade-in');
         
+        updateProgress(currentIndex);
         resetTimer();
     }, 1000);
 }
