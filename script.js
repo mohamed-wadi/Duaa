@@ -105,12 +105,68 @@ function speakText(text) {
     synth.speak(utterThis);
 }
 
+function resetTimer() {
+    clearInterval(currentInterval);
+    currentInterval = setInterval(() => {
+        nextDua();
+    }, 15000);
+}
+
+function displayDua(index) {
+    const contentDiv = document.getElementById('dua-content');
+    
+    if (index >= currentDuas.length) {
+        clearInterval(currentInterval);
+        contentDiv.classList.remove('fade-in');
+        contentDiv.classList.add('fade-out');
+        document.querySelector('.controls').style.display = 'none';
+        
+        setTimeout(() => {
+            let finalText = 'تقبل الله منا ومنكم صالح الأعمال.';
+            contentDiv.textContent = finalText;
+            contentDiv.classList.remove('fade-out');
+            contentDiv.classList.add('fade-in');
+            speakText(finalText);
+        }, 800);
+        return;
+    }
+    
+    // Fade out
+    contentDiv.classList.remove('fade-in');
+    contentDiv.classList.add('fade-out');
+    
+    setTimeout(() => {
+        let text = currentDuas[index];
+        contentDiv.textContent = text;
+        contentDiv.classList.remove('fade-out');
+        contentDiv.classList.add('fade-in');
+        speakText(text);
+    }, 500); // Wait for fade out
+}
+
+function nextDua() {
+    if (currentIndex < currentDuas.length) {
+        currentIndex++;
+        displayDua(currentIndex);
+        resetTimer();
+    }
+}
+
+function prevDua() {
+    if (currentIndex > 0) {
+        currentIndex--;
+        displayDua(currentIndex);
+        resetTimer();
+    }
+}
+
 function startDua(person) {
     currentPerson = person;
     document.getElementById('start-screen').classList.remove('active');
     setTimeout(() => {
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('dua-screen').style.display = 'block';
+        document.querySelector('.controls').style.display = 'flex'; // show controls
         
         // Trigger reflow
         void document.getElementById('dua-screen').offsetWidth;
@@ -126,49 +182,15 @@ function startDua(person) {
         }
         
         currentIndex = 0;
-        showNextDua();
-        currentInterval = setInterval(showNextDua, 15000); // 15 seconds
-    }, 1000);
-}
-
-function showNextDua() {
-    if (currentIndex >= currentDuas.length) {
-        clearInterval(currentInterval);
+        
+        // Initial Display without fade-out
         const contentDiv = document.getElementById('dua-content');
-        contentDiv.classList.remove('fade-in');
-        contentDiv.classList.add('fade-out');
-        setTimeout(() => {
-            let finalText = 'تقبل الله منا ومنكم صالح الأعمال.';
-            contentDiv.textContent = finalText;
-            contentDiv.classList.remove('fade-out');
-            contentDiv.classList.add('fade-in');
-            speakText(finalText);
-        }, 1000);
-        return;
-    }
-    
-    const contentDiv = document.getElementById('dua-content');
-    
-    // First time, no need to fade out
-    if (currentIndex === 0) {
         let text = currentDuas[currentIndex];
         contentDiv.textContent = text;
+        contentDiv.classList.remove('fade-out');
         contentDiv.classList.add('fade-in');
         speakText(text);
-        currentIndex++;
-    } else {
-        // Fade out
-        contentDiv.classList.remove('fade-in');
-        contentDiv.classList.add('fade-out');
         
-        setTimeout(() => {
-            // Change text and fade in
-            let text = currentDuas[currentIndex];
-            contentDiv.textContent = text;
-            contentDiv.classList.remove('fade-out');
-            contentDiv.classList.add('fade-in');
-            speakText(text);
-            currentIndex++;
-        }, 1000); // Wait for fade out animation
-    }
+        resetTimer();
+    }, 1000);
 }
