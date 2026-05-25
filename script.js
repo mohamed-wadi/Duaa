@@ -65,8 +65,48 @@ const duasMohammed = [
 let currentInterval = null;
 let currentIndex = 0;
 let currentDuas = [];
+let currentPerson = '';
+
+// --- Voice Setup ---
+let synth = window.speechSynthesis;
+let maleVoice = null;
+let femaleVoice = null;
+
+function loadVoices() {
+    let voices = synth.getVoices();
+    let arabicVoices = voices.filter(v => v.lang.startsWith('ar'));
+    
+    // Try to find known female and male voice names
+    femaleVoice = arabicVoices.find(v => v.name.includes('Hoda') || v.name.includes('Laila') || v.name.includes('Zeina')) || arabicVoices[0];
+    maleVoice = arabicVoices.find(v => v.name.includes('Naayf') || v.name.includes('Maged') || v.name.includes('Tarik') || v.name.includes('Majed')) || arabicVoices[0];
+}
+
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+}
+loadVoices();
+
+function speakText(text) {
+    if (synth.speaking) {
+        synth.cancel();
+    }
+    let utterThis = new SpeechSynthesisUtterance(text);
+    utterThis.lang = 'ar-SA';
+    utterThis.rate = 0.8; // Speak slowly for reverence
+    
+    if (currentPerson === 'fadwa') {
+        if (femaleVoice) utterThis.voice = femaleVoice;
+        utterThis.pitch = 1.2; // Higher pitch
+    } else {
+        if (maleVoice) utterThis.voice = maleVoice;
+        utterThis.pitch = 0.8; // Lower pitch
+    }
+    
+    synth.speak(utterThis);
+}
 
 function startDua(person) {
+    currentPerson = person;
     document.getElementById('start-screen').classList.remove('active');
     setTimeout(() => {
         document.getElementById('start-screen').style.display = 'none';
@@ -98,9 +138,11 @@ function showNextDua() {
         contentDiv.classList.remove('fade-in');
         contentDiv.classList.add('fade-out');
         setTimeout(() => {
-            contentDiv.textContent = 'تقبل الله منا ومنكم صالح الأعمال.';
+            let finalText = 'تقبل الله منا ومنكم صالح الأعمال.';
+            contentDiv.textContent = finalText;
             contentDiv.classList.remove('fade-out');
             contentDiv.classList.add('fade-in');
+            speakText(finalText);
         }, 1000);
         return;
     }
@@ -109,8 +151,10 @@ function showNextDua() {
     
     // First time, no need to fade out
     if (currentIndex === 0) {
-        contentDiv.textContent = currentDuas[currentIndex];
+        let text = currentDuas[currentIndex];
+        contentDiv.textContent = text;
         contentDiv.classList.add('fade-in');
+        speakText(text);
         currentIndex++;
     } else {
         // Fade out
@@ -119,9 +163,11 @@ function showNextDua() {
         
         setTimeout(() => {
             // Change text and fade in
-            contentDiv.textContent = currentDuas[currentIndex];
+            let text = currentDuas[currentIndex];
+            contentDiv.textContent = text;
             contentDiv.classList.remove('fade-out');
             contentDiv.classList.add('fade-in');
+            speakText(text);
             currentIndex++;
         }, 1000); // Wait for fade out animation
     }
