@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دعاء</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-pattern"></div>
+    <div class="container" id="app">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="title">بسم الله الرحمن الرحيم</h1>
+            <p class="subtitle">اختر الاسم لبدء الدعاء</p>
+            <div class="options">
+                <button class="btn" onclick="startDua('fadwa')">فدوى</button>
+                <button class="btn" onclick="startDua('mohammed')">محمد</button>
+            </div>
+        </div>
+
+        <!-- Dua Screen -->
+        <div id="dua-screen" class="screen">
+            <h2 id="dua-title" class="dua-title"></h2>
+            <div id="dua-content" class="dua-text fade-in"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
